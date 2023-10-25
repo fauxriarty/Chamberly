@@ -12,4 +12,20 @@
     <string name="swipe_right_to_start_chatting">Swipe right to start chatting</string>
     <string name="message">Message</string>
     <string name="john_grady_cole">John Grady Cole</string>
+    <string name="user_icon">User Icon</string>
+    <string name="chamberly">CHAMBERLY</string>
+    <string name="search">Search</string>
+    <string name="create_a_chamber">Create a Chamber</string>
+    <string name="todo">TODO</string>
+    <string name="grouptitle">groupTitle</string>
+    <string name="send">Send</string>
+    <string name="type_a_message">Type a message...</string>
+    <string name="start_a_chat">Start a Chat</string>
+    <string name="create_chamber">Create Chamber</string>
+    <string name="enter_chamber_title">Enter Chamber Title...</string>
+    <string name="dislike">disliked</string>
+    <string name="this_is_a_message">This is a Message</string>
+    <string name="chat_icon">Chat Icon</string>
+    <string name="title">Title</string>
+    <string name="_1_2">1/2</string>
 </resources>

@@ -31,7 +31,7 @@
             android:textSize="20sp"
             android:textColor="@color/white"
             android:textStyle="bold"
-            android:text="Title" />
+            android:text="@string/title" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -45,13 +45,13 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/chat"
                 android:padding="8dp"
-                android:contentDescription="Chat Icon" />
+                android:contentDescription="@string/chat_icon" />
 
             <TextView
                 android:id="@+id/num_chatter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1/2"
+                android:text="@string/_1_2"
                 android:textStyle="bold"
                 android:textSize="16sp" />
 

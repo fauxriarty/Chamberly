@@ -16,7 +16,7 @@
         app:cardPreventCornerOverlap="false"
         app:cardUseCompatPadding="true"
         app:layout_constraintEnd_toEndOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:id="@+id/layout_gchat_container_me"
@@ -33,7 +33,7 @@
                 android:paddingLeft="12dp"
                 android:paddingTop="8dp"
                 android:paddingRight="12dp"
-                android:text="This is a Message"
+                android:text="@string/this_is_a_message"
                 android:textColor="#ffffff"
                 android:textSize="16sp" />
         </LinearLayout>

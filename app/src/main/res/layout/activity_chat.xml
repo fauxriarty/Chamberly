@@ -19,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="groupTitle"
+            android:text="@string/grouptitle"
             android:textColor="@android:color/black"
             android:textSize="18sp" />
 
@@ -46,13 +46,16 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Type a message..." />
+            android:hint="@string/type_a_message"
+            android:minHeight="48dp"
+            android:inputType=""
+            android:autofillHints="" />
 
         <Button
             android:id="@+id/buttonSend"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Send" />
+            android:layout_height="48dp"
+            android:text="@string/send" />
 
     </LinearLayout>
 

@@ -36,7 +36,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Ban User"
-        android:textColor="@color/red"
-        />
+        android:textColor="#B71C1C" />
 
 </LinearLayout>

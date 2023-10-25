@@ -15,10 +15,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.play.integrity.internal.c
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflect.TypeToken
 import com.google.firebase.database.DataSnapshot
@@ -80,26 +78,24 @@ class ChatActivity : ComponentActivity(){
 
 
         //load cache file
-        if(groupChatId!=null){
-            cacheFile = File(this.cacheDir, groupChatId)
-            if (cacheFile.exists()) {
-                val content = this.openFileInput(groupChatId).bufferedReader().use { it.readText() }
-                val type = object : TypeToken<List<Message>>() {}.type
-                val cachedMessages: List<Message>? = gson.fromJson(content, type)
-                if (cachedMessages != null) {
-                    messages = cachedMessages.toMutableList()
-                    messageAdapter.notifyDataSetChanged()
-                }
+        cacheFile = File(this.cacheDir, groupChatId)
+        if (cacheFile.exists()) {
+            val content = this.openFileInput(groupChatId).bufferedReader().use { it.readText() }
+            val type = object : TypeToken<List<Message>>() {}.type
+            val cachedMessages: List<Message>? = gson.fromJson(content, type)
+            if (cachedMessages != null) {
+                messages = cachedMessages.toMutableList()
+                messageAdapter.notifyDataSetChanged()
             }
         }
-        val messagesRef = database.getReference(groupChatId!!).child("messages")
+        val messagesRef = database.getReference(groupChatId).child("messages")
         messagesRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 messages.clear() //clear the list
 
                 for (childSnapshot in snapshot.children) {
                     if (childSnapshot.exists()) {
-                        val messageValue = childSnapshot.getValue()
+                        val messageValue = childSnapshot.value
                         if (messageValue != null && messageValue is Map<*, *>) {
                             val uid = messageValue["uid"] as? String
                             val messageContent = messageValue["message_content"] as? String
@@ -150,7 +146,7 @@ class ChatActivity : ComponentActivity(){
             val senderName = sharedPreferences.getString("displayName", "NONE")
             val message = Message(uid!!, editText.text.toString(), "text", senderName!!)
 
-            val chatRef = database.getReference(groupChatId!!).child("messages").push().setValue(message)
+            val chatRef = database.getReference(groupChatId).child("messages").push().setValue(message)
                 .addOnSuccessListener {
                     editText.setText("")
                     messages.add(message)
@@ -169,7 +165,7 @@ class ChatActivity : ComponentActivity(){
                 val uid = sharedPreferences.getString("uid", auth.currentUser?.uid)
                 if (!snapshot.hasChild(uid!!)) {
                     // User's username does not exist in "members" node, exit the chat
-                    exitChat(groupChatId!!)
+                    exitChat(groupChatId)
                 }
             }
             override fun onCancelled(error: DatabaseError) {
@@ -406,7 +402,7 @@ class ChatActivity : ComponentActivity(){
     }
 
     private fun deleteChamber(groupChatId: String) {
-        val messagesRef = database.getReference(groupChatId!!)
+        val messagesRef = database.getReference(groupChatId)
 
         messagesRef.removeValue()
             .addOnSuccessListener {
