@@ -49,6 +49,7 @@ class ChatActivity : ComponentActivity(){
     private val auth = Firebase.auth                // get current user
     private val database = Firebase.database        // realtime database
     private val firestore = Firebase.firestore      // firestore
+    private val gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,21 +77,19 @@ class ChatActivity : ComponentActivity(){
                 showSelfDialog(message)
             }
         })
-        recyclerView.adapter = messageAdapter
 
 
         //load cache file
         if(groupChatId!=null){
             cacheFile = File(this.cacheDir, groupChatId)
-            if(cacheFile.exists()){
-                //load data from the file
-                //the content of the file is a JSON string
+            if (cacheFile.exists()) {
                 val content = this.openFileInput(groupChatId).bufferedReader().use { it.readText() }
-                // Convert the content to a list of Message and update the UI
-                val gson = Gson()
                 val type = object : TypeToken<List<Message>>() {}.type
-                messages= Gson().fromJson(content, type)
-                messageAdapter.notifyDataSetChanged()    // update the UI
+                val cachedMessages: List<Message>? = gson.fromJson(content, type)
+                if (cachedMessages != null) {
+                    messages = cachedMessages.toMutableList()
+                    messageAdapter.notifyDataSetChanged()
+                }
             }
         }
         val messagesRef = database.getReference(groupChatId!!).child("messages")
@@ -116,10 +115,13 @@ class ChatActivity : ComponentActivity(){
                 }
 
                 //save the data to the cache file with groupChatId as the file name
-                val content = Gson().toJson(messages)
-                this@ChatActivity.openFileOutput(groupChatId, Context.MODE_PRIVATE).use {
-                    it.write(content.toByteArray())
+                if (messages.isNotEmpty()) {
+                    val content = gson.toJson(messages)
+                    this@ChatActivity.openFileOutput(groupChatId, Context.MODE_PRIVATE).use {
+                        it.write(content.toByteArray())
+                    }
                 }
+
                 messageAdapter.setMessages(messages) // using new messages
                 recyclerView.scrollToPosition(messages.size - 1)
             }
@@ -226,7 +228,6 @@ class ChatActivity : ComponentActivity(){
             "against" to message.UID,
             "by" to UID,
             "groupChatId" to groupChatId,
-            "realHost" to "",
             "reason" to reason,
             "reportDate" to FieldValue.serverTimestamp(),
             "realHost" to authorName,
