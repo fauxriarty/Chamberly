@@ -38,7 +38,7 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
         koloda.kolodaListener = this
 
         // set adapter
-        adapter = ChamberAdapter(this)
+        adapter = ChamberAdapter()
         koloda.adapter =  adapter
 
 
@@ -118,6 +118,7 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
     private fun fetchChambersRecursively(query: Query) {
         query.get()
             .addOnSuccessListener { querySnapshot ->
+                Log.d("SearchActivity", "Number of chambers fetched: ${querySnapshot.documents.size}")
                 Log.e(TAG, "fetchChambers: ${querySnapshot.documents.size}")
                 for (documentSnapshot in querySnapshot) {
                     val chamber = documentSnapshot.toObject(Chamber::class.java)
@@ -126,7 +127,8 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
                         .update("publishedPool", false)
                     isVacant(chamber) { isVacant ->
                         if (isVacant) {
-                            adapter.setData(chamber)
+                            adapter.addData(chamber)
+                            Log.d("SearchActivity", "Setting data on the adapter: ${chamber.groupTitle}")
                         }
                         else{
                             // reset publishedPool as true again

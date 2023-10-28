@@ -27,6 +27,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title"
         android:text="@string/create_a_chamber"
+        android:textColor="@color/white"
         android:background="@drawable/rounded_button"
         android:textSize="20sp"
         android:layout_marginLeft="50dp"
@@ -68,6 +69,7 @@
         app:layout_constraintTop_toBottomOf="@id/follow_us_on_social_media"
         android:src="@drawable/ic_instagram"
         android:layout_marginTop="10dp"
+        android:layout_margin="20dp"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:contentDescription="@string/todo" />

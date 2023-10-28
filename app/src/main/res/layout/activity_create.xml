@@ -44,10 +44,11 @@
         android:layout_marginTop="30dp"
         android:background="@drawable/rounded_button"
         android:text="@string/create_chamber"
+        android:layout_margin="20dp"
         android:textColor="#ffffff"
         android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/chamber_title"
-        tools:ignore="TextContrastCheck"
-        tools:layout_editor_absoluteX="20dp" />
+        tools:ignore="TextContrastCheck" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
