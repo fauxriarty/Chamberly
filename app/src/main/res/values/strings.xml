@@ -28,4 +28,7 @@
     <string name="chat_icon">Chat Icon</string>
     <string name="title">Title</string>
     <string name="_1_2">1/2</string>
+
+    <string name="preference_file_key">com.company.chamberly_preferences</string>
+    <string name="notif_permission_requested_key">notification_permission_requested</string>
 </resources>
