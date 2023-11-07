@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -56,6 +57,8 @@ class ChatActivity : ComponentActivity(){
         val sharedPreferences = getSharedPreferences("cache", Context.MODE_PRIVATE) // get shared preferences
         val currentUser = auth.currentUser // get current user
         val uid = sharedPreferences.getString("uid", "") ?: currentUser?.uid // get uid
+        val infoButton = findViewById<ImageButton>(R.id.infoButton)
+
 
         messageAdapter = MessageAdapter(uid!!) // create message adapter
         //chamber = intent.getSerializableExtra("chamber") as Chamber // get chamber
@@ -127,11 +130,9 @@ class ChatActivity : ComponentActivity(){
             }
         })
 
-        // Find the information bar
-        val infoBar = findViewById<LinearLayout>(R.id.infoBar)
 
         // Set click listener for the information bar
-        infoBar.setOnClickListener {
+         infoButton.setOnClickListener {
             showInfoDialog()
         }
 
@@ -415,6 +416,4 @@ class ChatActivity : ComponentActivity(){
             .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
 
     }
-
-
 }

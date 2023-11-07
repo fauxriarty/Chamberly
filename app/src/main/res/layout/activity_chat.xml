@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -10,22 +11,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
+        android:gravity="center_vertical|center_horizontal"
         android:orientation="horizontal"
-        android:padding="14dp"
-        android:gravity="center_vertical|center_horizontal">
+        android:padding="14dp">
 
         <TextView
             android:id="@+id/groupTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="347dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="center"
             android:text="@string/grouptitle"
+            android:textAlignment="center"
             android:textColor="@android:color/black"
             android:textSize="18sp" />
 
+        <ImageButton
+            android:id="@+id/infoButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/display_name_icon"
+            tools:ignore="TouchTargetSizeCheck" />
+
     </LinearLayout>
-
-
 
     <!-- messages list -->
     <androidx.recyclerview.widget.RecyclerView
@@ -55,7 +64,8 @@
             android:id="@+id/buttonSend"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:text="@string/send" />
+            android:text="@string/send"
+            tools:ignore="TouchTargetSizeCheck" />
 
     </LinearLayout>
 
