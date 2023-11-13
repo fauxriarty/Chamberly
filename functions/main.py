@@ -1,33 +1,36 @@
+from flask import Flask, request, jsonify
 import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
-from firebase_admin import messaging
+from firebase_admin import credentials, firestore, messaging
 
-cred = credentials.Certificate('path/to/serviceAccountKey.json')
+app = Flask(__name__)
+
+# Initialize Firebase Admin SDK
+cred = credentials.ApplicationDefault()
 firebase_admin.initialize_app(cred)
 
-db = firestore.client()
+@app.route('/sendNotification', methods=['POST'])
+def send_notification():
+    try:
+        data = request.json
 
-def send_fcm_message(sender_id, recipient_token, message):
-    # Create a FCM message
-    fcm_message = messaging.Message(
-        token=recipient_token,
-        notification=messaging.Notification(
-            title=f"New message from {sender_id}",
-            body=message,
+        # Extract data
+        sender_id = data['senderId']
+        recipient_token = data['recipientToken']
+        message_text = data['message']
+
+        # Create and send FCM message
+        fcm_message = messaging.Message(
+            token=recipient_token,
+            notification=messaging.Notification(
+                title=f"New message from {sender_id}",
+                body=message_text,
+            )
         )
-    )
+        response = messaging.send(fcm_message)
 
-    # Send the message
-    response = messaging.send(fcm_message)
-    return response
+        return jsonify({"success": True, "message": "Notification sent", "response": response}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
-# Cloud Function to listen to 'notifications' collection
-def notification_listener(event, context):
-    notification_data = event.to_dict()
-    sender_id = notification_data['senderId']
-    recipient_token = notification_data['recipientToken']
-    message = notification_data['message']
-
-    # Send FCM message
-    send_fcm_message(sender_id, recipient_token, message)
+if __name__ == '__main__':
+    app.run(debug=True)
