@@ -30,7 +30,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import java.io.File
 
-
+//
 // TODO: Check caps and lowercase in both database and firestore
 
 class ChatActivity : ComponentActivity(){
