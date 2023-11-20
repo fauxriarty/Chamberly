@@ -18,12 +18,15 @@ import com.google.firebase.messaging.FirebaseMessaging
 class WelcomeActivity : AppCompatActivity() {
     private val auth = Firebase.auth
     private val database = Firebase.firestore
-
+    private var token: String? = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_welcome)
         val currentUser = auth.currentUser
         // Check if the user is logged in
+        //token = getFcmToken{}
+        val messaging = FirebaseMessaging.getInstance()
+        messaging.isAutoInitEnabled = true
         if (currentUser != null) {
             userExist(currentUser.uid) { exists ->
                 if (exists) {
@@ -58,15 +61,13 @@ class WelcomeActivity : AppCompatActivity() {
 
         val addButton = findViewById<Button>(R.id.continue_button)
         addButton.setOnClickListener {
-            Check()
+            check()
         }
     }
 
 
     //TODO: Check if user exist in database
     private fun userExist(uid: String, callback: (Boolean) -> Unit) {
-
-        updateFcmTokenForExistingUser(uid)
         // Check if UID is exist in Display_Names collection
         val displayNameRef = database.collection("Display_Names").whereEqualTo("UID", uid)
         displayNameRef.get()
@@ -78,86 +79,101 @@ class WelcomeActivity : AppCompatActivity() {
                         .addOnSuccessListener { querySnapshot ->
                             callback(!querySnapshot.isEmpty)
                         }
-                        .addOnFailureListener { exception ->
+                        .addOnFailureListener {
                             callback(false)
                         }
                 } else {
                     callback(false)
                 }
             }
-            .addOnFailureListener { exception ->
+            .addOnFailureListener {
                 callback(false)
             }
     }
 
-    private fun Check() {
+    private fun check() {
         val user = Firebase.auth.currentUser
         val editText = findViewById<EditText>(R.id.display_name)
 
         if (user != null) {
             val displayName = editText.text.toString()
+            // Save displayName to SharedPreferences
+            val sharedPreferences = getSharedPreferences("userDetails", Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            editor.putString("uid", user.uid)
+            editor.putString("displayName", displayName)
+            editor.apply()
+
 
             // Check if displayName is already used
-            val displayNameRef = database.collection("Display_Names").whereEqualTo("displayName", displayName)
+            val displayNameRef =
+                database.collection("Display_Names").whereEqualTo("displayName", displayName)
             displayNameRef.get()
                 .addOnSuccessListener { querySnapshot ->
                     if (querySnapshot.isEmpty) {
                         // displayName is available, proceed with storing data
+                        // store fcm token also for receiving notifications
+                        getFcmToken { fcmToken ->
+                            if (fcmToken != null) {
+                                if (fcmToken.isNotBlank() && fcmToken.isNotBlank()) {
+                                    token = fcmToken
+                                }
+                            }
+                        }
                         val displayNameData = mapOf(
                             "Display_Name" to displayName,
                             "Email" to "${user.uid}@chamberly.net",
-                            "UID" to user.uid
+                            "UID" to user.uid,
+                            "FCMTOKEN" to token
                         )
                         database.collection("Display_Names").document(displayName)
                             .set(displayNameData)
                             .addOnSuccessListener {
                                 // Add a new document with a generated ID into Account collection
-                                Toast.makeText(this, "Welcome to Chamberly!", Toast.LENGTH_SHORT).show()
-                                FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-                                    if (task.isSuccessful) {
-                                        // Get new FCM registration token
-                                        val fcmToken = task.result
+                                Toast.makeText(this, "Welcome to Chamberly!", Toast.LENGTH_SHORT)
+                                    .show()
 
-                                        val account = mapOf(
-                                            "UID" to user.uid,
-                                            "Display_Name" to displayName,
-                                            "Email" to "${user.uid}@chamberly.net",
-                                            "platform" to "android",
-                                            "timestamp" to FieldValue.serverTimestamp(),
-                                            "fcmToken" to fcmToken // Include the FCM token here
-                                        )
-                                        database.collection("Accounts").document(user.uid.toString())
-                                            .set(account)
-                                            .addOnSuccessListener {
-                                                Log.d("TAG", "DocumentSnapshot successfully written!")
+                                val account = mapOf(
+                                    "UID" to user.uid,
+                                    "Display_Name" to displayName,
+                                    "Email" to "${user.uid}@chamberly.net",
+                                    "platform" to "android",
+                                    "timestamp" to FieldValue.serverTimestamp(),
+                                    "FCMTOKEN" to token
+                                )
+                                database.collection("Accounts").document(user.uid)
+                                    .set(account)
+                                    .addOnSuccessListener {
+                                        Log.d("TAG", "DocumentSnapshot successfully written!")
 
-                                                // Save displayName to SharedPreferences
-                                                val sharedPreferences = getSharedPreferences("cache", Context.MODE_PRIVATE)
-                                                val editor = sharedPreferences.edit()
-                                                editor.putString("uid", user.uid)
-                                                editor.putString("displayName", displayName)
-                                                editor.apply()
+                                        // Save displayName to SharedPreferences
+                                        val sharedPreferences =
+                                            getSharedPreferences("cache", Context.MODE_PRIVATE)
+                                        val editor = sharedPreferences.edit()
+                                        editor.putString("uid", user.uid)
+                                        editor.putString("displayName", displayName)
+                                        editor.apply()
 
-                                                // Go to MainActivity
-                                                val intent = Intent(this, MainActivity::class.java)
-                                                startActivity(intent)
-                                                finish() // Optional: Finish WelcomeActivity to prevent going back
-                                            }
-                                            .addOnFailureListener { e ->
-                                                Log.w("TAG", "Error writing document", e)
-                                                Toast.makeText(this, "Error writing document", Toast.LENGTH_SHORT).show()
-                                            }
-
-                                        // Rest of your Firestore document set/update logic...
-                                    } else {
-                                        Log.w("TAG", "Fetching FCM registration token failed", task.exception)
+                                        // Go to MainActivity
+                                        val intent = Intent(this, MainActivity::class.java)
+                                        startActivity(intent)
+                                        finish() // Optional: Finish WelcomeActivity to prevent going back
                                     }
-                                }
-
-
+                                    .addOnFailureListener { e ->
+                                        Log.w("TAG", "Error writing document", e)
+                                        Toast.makeText(
+                                            this,
+                                            "Error writing document",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                             }
                             .addOnFailureListener {
-                                Toast.makeText(this, "Error storing displayName", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    this,
+                                    "Error storing displayName",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                     } else {
                         // displayName is already used
@@ -171,21 +187,19 @@ class WelcomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateFcmTokenForExistingUser(uid: String) {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val fcmToken = task.result
-                database.collection("Accounts").document(uid)
-                    .update("fcmToken", fcmToken)
-                    .addOnSuccessListener {
-                        Log.d("TAG", "FCM Token updated successfully")
-                    }
-                    .addOnFailureListener { e ->
-                        Log.w("TAG", "Error updating FCM Token", e)
-                    }
+    //asynchronous operation
+    fun getFcmToken(callback: (String?) -> Unit) {
+        FirebaseMessaging.getInstance().token.addOnSuccessListener { fcmToken ->
+            if (fcmToken != null) {
+                Log.i("tokenFCM", fcmToken)
+                callback(fcmToken)
+            } else {
+                Log.i("tokenFCM", "Token is null")
+                callback(null)
             }
+        }.addOnFailureListener {
+            Log.e("tokenFCM", "Error fetching token", it)
+            callback(null)
         }
     }
-
-
 }

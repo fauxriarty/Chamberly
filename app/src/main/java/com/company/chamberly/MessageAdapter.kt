@@ -29,10 +29,11 @@ class MessageAdapter(private val uid: String) :
         val textSender: TextView = itemView.findViewById(R.id.text_gchat_user_other)
         val textMessage: TextView = itemView.findViewById(R.id.text_gchat_message_other)
         init {
-            // set on long click listener for other users' messages
+            // set on long click listener
             itemView.setOnLongClickListener {
-                val message = messages[getBindingAdapterPosition()]
-                onMessageLongClickListener?.onMessageLongClick(message)
+                val message = messages[adapterPosition]
+                onMessageLongClickListener!!.onMessageLongClick(message)
+                onMessageLongClickListener!!.onSelfLongClick(message)
                 true
             }
         }
@@ -40,17 +41,7 @@ class MessageAdapter(private val uid: String) :
 
     inner class MessageViewHolderMe(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textMessage: TextView = itemView.findViewById(R.id.text_gchat_message_me)
-        init {
-            // set on long click listener for my messages
-            itemView.setOnLongClickListener {
-                val message = messages[getBindingAdapterPosition()]
-                onMessageLongClickListener?.onSelfLongClick(message)
-                true
-            }
-        }
     }
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
@@ -119,5 +110,3 @@ class MessageAdapter(private val uid: String) :
 
 
 }
-
-
