@@ -42,6 +42,11 @@ class MainActivity : ComponentActivity() {
         val usernameTextView = findViewById<TextView>(R.id.usernameTextView)
         usernameTextView.text = displayName
 
+        val followUsButton = findViewById<Button>(R.id.followUs)
+        followUsButton.setOnClickListener {
+            openInstagramPage("https://www.instagram.com/chamberly_app/")
+        }
+
 
         CreateButton.setOnClickListener {
             val intent = intent
@@ -76,6 +81,19 @@ class MainActivity : ComponentActivity() {
             requestNotificationPermission()
         }
     }
+    private fun openInstagramPage(url: String) {
+        try {
+            // Try to open the Instagram page in the Instagram app
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("$url"))
+            intent.setPackage("com.instagram.android")
+            startActivity(intent)
+        } catch (e: Exception) {
+            // If the Instagram app is not installed, open the page in a web browser
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("$url"))
+            startActivity(intent)
+        }
+    }
+
     private fun requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)

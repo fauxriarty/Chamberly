@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:id="@+id/home_page"
     android:layout_height="match_parent"
@@ -18,7 +19,6 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:src="@drawable/profile_pic" />
 
         <TextView
@@ -103,19 +103,25 @@
         android:orientation="horizontal"
         android:layout_marginTop="125dp">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/instagramIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/insta" />
+            android:background="@null"
+            android:paddingTop="15dp"
+            android:src="@drawable/insta"
+            tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
-        <TextView
+        <Button
             android:id="@+id/followUs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:background="@null"
+            android:paddingLeft="3dp"
+            android:textAllCaps="false"
             android:textColor="#2E2E5B"
-            android:layout_marginTop="2.5dp"
+            android:layout_marginTop="3.5dp"
             android:text="@string/follow_us_on_instagram" />
     </LinearLayout>
 
