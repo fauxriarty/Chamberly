@@ -106,7 +106,7 @@ class ChatActivity : ComponentActivity(){
 
                 for (childSnapshot in snapshot.children) {
                     if (childSnapshot.exists()) {
-                        val messageValue = childSnapshot.getValue()
+                        val messageValue = childSnapshot.value
                         if (messageValue != null && messageValue is Map<*, *>) {
                             val uid = messageValue["uid"] as? String
                             val messageContent = messageValue["message_content"] as? String

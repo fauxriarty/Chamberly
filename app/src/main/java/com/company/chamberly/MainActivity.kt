@@ -7,20 +7,14 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+
 import androidx.core.app.NotificationManagerCompat
-import com.company.chamberly.ui.theme.ChamberlyTheme
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -32,7 +26,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         checkNotificationPermission()
-        val CreateButton = findViewById<Button>(R.id.create_button)
+
+        val CreateButton = findViewById<Button>(R.id.createChamberButton)
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val areNotificationsEnabled = notificationManager.areNotificationsEnabled()
         if (!areNotificationsEnabled) {
@@ -42,13 +37,18 @@ class MainActivity : ComponentActivity() {
             startActivity(intent)
         }
 
+        val sharedPreferences = getSharedPreferences("userDetails", Context.MODE_PRIVATE)
+        val displayName = sharedPreferences.getString("displayName", null) ?: "Anonymous"
+        val usernameTextView = findViewById<TextView>(R.id.usernameTextView)
+        usernameTextView.text = displayName
+
 
         CreateButton.setOnClickListener {
             val intent = intent
             intent.setClass(this, CreateActivity::class.java)
             startActivity(intent)
         }
-        val SearchButton = findViewById<Button>(R.id.search_button)
+        val SearchButton = findViewById<Button>(R.id.findChamberButton)
         SearchButton.setOnClickListener {
             val intent = intent
             intent.setClass(this, SearchActivity::class.java)
