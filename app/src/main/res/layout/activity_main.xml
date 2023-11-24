@@ -12,7 +12,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="85dp"
         android:orientation="horizontal"
         android:paddingTop="24dp">
 
@@ -26,23 +27,13 @@
             android:layout_width="257dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:paddingTop="7dp"
+            android:paddingTop="9dp"
+            android:text="Username"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="#2E2E5B" />
+            android:textColor="#2E2E5B"
+            android:textSize="21sp" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:paddingTop="5dp"
-            android:src="@drawable/coins" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:text="0"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
     </LinearLayout>
 
     <!-- Dolphin Image -->
@@ -138,28 +129,20 @@
         <ImageButton
             android:id="@+id/homeButton"
             android:layout_width="wrap_content"
-            android:layout_margin="18dp"
             android:layout_height="wrap_content"
             android:background="@null"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
             android:contentDescription="@string/chamberly"
             android:src="@drawable/home" />
-
-        <ImageButton
-
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:layout_margin="18dp"
-            android:contentDescription="@string/chamberly"
-            android:enabled="false"
-            android:src="@drawable/myjournal" />
 
         <!-- Placeholder Button (Non-functional) -->
         <ImageButton
             android:layout_width="wrap_content"
-            android:layout_margin="18dp"
             android:layout_height="wrap_content"
             android:background="@null"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
             android:contentDescription="@string/chamberly"
             android:enabled="false"
             android:src="@drawable/mychambers" />
