@@ -8,6 +8,7 @@
 
     <!-- Profile Section -->
     <LinearLayout
+        android:paddingStart="18dp"
         android:id="@+id/profileSection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,10 +18,16 @@
         android:orientation="horizontal"
         android:paddingTop="24dp">
 
-        <ImageView
+        <ImageButton
+            android:id="@+id/profilePic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/profile_pic" />
+            android:background="@null"
+            android:paddingTop="1dp"
+            android:paddingEnd="2dp"
+            android:contentDescription="@string/chamberly"
+            android:src="@drawable/profile_pic"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <TextView
             android:id="@+id/usernameTextView"
@@ -28,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:paddingTop="9dp"
-            android:text="Username"
+            android:text="@string/username"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColor="#2E2E5B"
             android:textSize="21sp" />

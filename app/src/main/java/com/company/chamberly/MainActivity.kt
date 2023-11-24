@@ -1,5 +1,6 @@
 package com.company.chamberly
 
+import android.app.AlertDialog
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
@@ -9,6 +10,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -42,6 +44,11 @@ class MainActivity : ComponentActivity() {
         val usernameTextView = findViewById<TextView>(R.id.usernameTextView)
         usernameTextView.text = displayName
 
+        val profilePicButton = findViewById<ImageButton>(R.id.profilePic)
+        profilePicButton.setOnClickListener {
+            showProfileOptionsPopup()
+        }
+
         val followUsButton = findViewById<Button>(R.id.followUs)
         followUsButton.setOnClickListener {
             openInstagramPage("https://www.instagram.com/chamberly_app/")
@@ -68,6 +75,28 @@ class MainActivity : ComponentActivity() {
         }
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
+
+    private fun showProfileOptionsPopup() {
+        val options = arrayOf("Delete Account", "Show Privacy Policy")
+        val builder = AlertDialog.Builder(this)
+        builder.setItems(options) { dialog, which ->
+            when (which) {
+                0 -> deleteAccount() // Delete account option
+                1 -> showPrivacyPolicy() // Show privacy policy option
+            }
+        }
+        builder.show()
+    }
+
+    private fun showPrivacyPolicy() {
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.chamberly.net/privacy-policy"))
+        startActivity(browserIntent)
+    }
+
+    private fun deleteAccount() {
+
+    }
+
     override fun onDestroy() {
         onBackPressedCallback.remove()
         super.onDestroy()

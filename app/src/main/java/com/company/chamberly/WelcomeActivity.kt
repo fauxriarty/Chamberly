@@ -2,10 +2,19 @@ package com.company.chamberly
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.ktx.auth
@@ -19,9 +28,22 @@ class WelcomeActivity : AppCompatActivity() {
     private val auth = Firebase.auth
     private val database = Firebase.firestore
     private var token: String? = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val sharedPreferences = getSharedPreferences("userDetails", Context.MODE_PRIVATE)
+        val hasLoggedIn = sharedPreferences.getBoolean("hasLoggedIn", false)
+
+        if (hasLoggedIn) {
+            // User has already logged in, skip to MainActivity
+            goToMainActivity()
+            return
+        }
+
         setContentView(R.layout.activity_welcome)
+
+
         val currentUser = auth.currentUser
         // Check if the user is logged in
         //token = getFcmToken{}
@@ -31,9 +53,9 @@ class WelcomeActivity : AppCompatActivity() {
             userExist(currentUser.uid) { exists ->
                 if (exists) {
                     // The user exists
+                    sharedPreferences.edit().putBoolean("hasLoggedIn", true).apply()
                     Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
+                    goToMainActivity()
                 } else {
                     // The user does not exist
                     // Handle the case when the user does not exist
@@ -48,6 +70,7 @@ class WelcomeActivity : AppCompatActivity() {
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
                         val user = auth.currentUser
+                        sharedPreferences.edit().putBoolean("hasLoggedIn", true).apply()
                         Toast.makeText(this, "Welcome!${user?.uid}", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(
@@ -59,10 +82,42 @@ class WelcomeActivity : AppCompatActivity() {
                 }
         }
 
-        val addButton = findViewById<Button>(R.id.continue_button)
+
+
+
+        val addButton = findViewById<Button>(R.id.btnCreateAccount)
         addButton.setOnClickListener {
             check()
         }
+
+
+        val tvTermsConditions = findViewById<TextView>(R.id.tvTermsConditions)
+        val fullText = getString(R.string.feel_free_we_do_not_ask_your_real_name_but_it_must_comply_with_the_terms_conditions)
+        val spannableString = SpannableString(fullText)
+
+        val termsStart = fullText.indexOf("Terms & Conditions")
+        val termsEnd = termsStart + "Terms & Conditions".length
+
+        val clickableSpan = object : ClickableSpan() {
+            override fun onClick(view: View) {
+                // Handle the click event here, for example, open a browser with the URL
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.chamberly.net/terms-and-conditions"))
+                startActivity(browserIntent)
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                super.updateDrawState(ds)
+                ds.color = Color.parseColor("#7A7AFF") // Set the color you want here
+                ds.isUnderlineText = false // Remove underline
+            }
+        }
+
+        spannableString.setSpan(clickableSpan, termsStart, termsEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+        tvTermsConditions.text = spannableString
+        tvTermsConditions.movementMethod = LinkMovementMethod.getInstance()
+        tvTermsConditions.highlightColor = Color.TRANSPARENT // Optional: Remove the default click highlight color
+
     }
 
 
@@ -91,9 +146,16 @@ class WelcomeActivity : AppCompatActivity() {
             }
     }
 
+    private fun goToMainActivity() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+
     private fun check() {
         val user = Firebase.auth.currentUser
-        val editText = findViewById<EditText>(R.id.display_name)
+        val editText = findViewById<EditText>(R.id.etEmail)
 
         if (user != null) {
             val displayName = editText.text.toString()

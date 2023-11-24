@@ -45,8 +45,8 @@
         <activity
             android:name=".WelcomeActivity"
             android:exported="true"
-            android:label="@string/title_activity_welcome"
-            android:theme="@style/Theme.AppCompat">
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:label="@string/title_activity_welcome">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
