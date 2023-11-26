@@ -151,6 +151,7 @@ class MainActivity : ComponentActivity() {
         startActivity(intent)
         finish()
     }
+
     private fun openInstagramPage(url: String) {
         try {
             // Try to open the Instagram page in the Instagram app

@@ -21,6 +21,7 @@
         tools:targetApi="tiramisu">
         <activity
             android:name=".ActiveChambersActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:exported="false" />
 
         <service
@@ -57,6 +58,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
