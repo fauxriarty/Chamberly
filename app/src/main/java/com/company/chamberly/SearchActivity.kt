@@ -45,8 +45,8 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
         // fetch now data from firestore onCreate
         //fetchChambers()
 
-        val dislikeButton: ImageButton = findViewById(R.id.dislike)
-        val likeButton: ImageButton = findViewById(R.id.like)
+        val dislikeButton: ImageButton = findViewById(R.id.ic_skip)
+        val likeButton: ImageButton = findViewById(R.id.ic_chat)
 
 
         dislikeButton.setOnClickListener {
@@ -56,6 +56,14 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
         likeButton.setOnClickListener {
             koloda.onClickRight()
         }
+
+       // val backButton: ImageButton = findViewById(R.id.backButton)
+        //backButton.setOnClickListener {
+            // Explicitly start MainActivity
+         //   val intent = Intent(this, MainActivity::class.java)
+          //  startActivity(intent)
+       // }
+
 
         onBackPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -104,7 +112,7 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
                 .limit(4)
         } else {
             // fetch next 4 chambers
-            Log.e(TAG, "New FetchChambers: last document is at ${lastTimestamp}")
+            Log.e(TAG, "New FetchChambers: last document is at $lastTimestamp")
             firestore.collection("GroupChatIds")
                 .whereEqualTo("locked", false)
                 .whereEqualTo("publishedPool", true)
@@ -147,7 +155,7 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
 
     // override koloda listener
     override fun onCardSwipedLeft(position: Int) {
-        val chamber = (adapter as ChamberAdapter).getItem(position+1)
+        val chamber = adapter.getItem(position+1)
         Log.e("SearchActivity", "Card swiped left : ${chamber.groupTitle}")
 
 
@@ -159,7 +167,7 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
     }
     override fun onCardSwipedRight(position: Int) {
 
-        val chamber = (adapter as ChamberAdapter).getItem(position+1)
+        val chamber = adapter.getItem(position+1)
         isVacant(chamber) { isVacant ->
             if (isVacant) {
                 // add user to Chat
@@ -172,7 +180,7 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
 
     override fun onClickLeft(position: Int)  {
         Log.e("SearchActivity", "Card swiped left at position: $position")
-        val chamber = (adapter as ChamberAdapter).getItem(position+1)
+        val chamber = adapter.getItem(position+1)
         Log.e("SearchActivity", "Card swiped left : ${chamber.groupTitle}")
 
         firestore.collection("GroupChatIds").document(chamber.groupChatId)
@@ -184,7 +192,7 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
     override fun onClickRight(position: Int)  {
         //Log.e("SearchActivity", "Card swiped right at position: $position")
         // TODO: check why position starts from -1
-        val chamber = (adapter as ChamberAdapter).getItem(position+1)
+        val chamber = adapter.getItem(position+1)
         isVacant(chamber) { isVacant ->
             if (isVacant) {
                 // add user to Chat
@@ -217,15 +225,15 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
         }
     }
 
-    fun joinChat(chamber: Chamber){
+    private fun joinChat(chamber: Chamber){
         val sharedPreferences = getSharedPreferences("cache", Context.MODE_PRIVATE)
         val authorUID = sharedPreferences.getString("uid", currentUser?.uid)
         val authorName = sharedPreferences.getString("displayName", "Anonymous")
         val chamberDataRef = database.reference.child(chamber.groupChatId)
-        val message = Message(authorUID!!, "${authorName} user joined and chamber auto-locked", "text", authorName!!)
+        val message = Message(authorUID!!, "$authorName user joined and chamber auto-locked", "text", authorName!!)
         chamberDataRef.child("messages").push().setValue(message)
             .addOnSuccessListener {
-                chamberDataRef.child("Users").child("members").child(authorUID!!).setValue(authorName)
+                chamberDataRef.child("Users").child("members").child(authorUID).setValue(authorName)
                     .addOnSuccessListener {
                         firestore.collection("GroupChatIds").document(chamber.groupChatId).update("locked" , true)
                             .addOnSuccessListener{

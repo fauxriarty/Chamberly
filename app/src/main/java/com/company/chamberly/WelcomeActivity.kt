@@ -35,89 +35,95 @@ class WelcomeActivity : AppCompatActivity() {
         val sharedPreferences = getSharedPreferences("userDetails", Context.MODE_PRIVATE)
         val hasLoggedIn = sharedPreferences.getBoolean("hasLoggedIn", false)
 
-        if (hasLoggedIn) {
-            // User has already logged in, skip to MainActivity
+        if (hasLoggedIn && Firebase.auth.currentUser != null) {
             goToMainActivity()
-            return
-        }
-
-        setContentView(R.layout.activity_welcome)
-
-
-        val currentUser = auth.currentUser
-        // Check if the user is logged in
-        //token = getFcmToken{}
-        val messaging = FirebaseMessaging.getInstance()
-        messaging.isAutoInitEnabled = true
-        if (currentUser != null) {
-            userExist(currentUser.uid) { exists ->
-                if (exists) {
-                    // The user exists
-                    sharedPreferences.edit().putBoolean("hasLoggedIn", true).apply()
-                    Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show()
-                    goToMainActivity()
-                } else {
-                    // The user does not exist
-                    // Handle the case when the user does not exist
-                    // For example, show a login screen or redirect to sign up page
-                }
-            }
         } else {
-            // The user is not logged in
-            // Handle the case when the user is not logged in
-            // For example, show a login screen or redirect to sign up page
-            auth.signInAnonymously()
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        val user = auth.currentUser
+            setContentView(R.layout.activity_welcome)
+
+
+            val currentUser = auth.currentUser
+            // Check if the user is logged in
+            //token = getFcmToken{}
+            val messaging = FirebaseMessaging.getInstance()
+            messaging.isAutoInitEnabled = true
+            if (currentUser != null) {
+                userExist(currentUser.uid) { exists ->
+                    if (exists) {
+                        // The user exists
                         sharedPreferences.edit().putBoolean("hasLoggedIn", true).apply()
-                        Toast.makeText(this, "Welcome!${user?.uid}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show()
+                        goToMainActivity()
                     } else {
-                        Toast.makeText(
-                            baseContext,
-                            "Authentication failed.",
-                            Toast.LENGTH_SHORT,
-                        ).show()
+                        // The user does not exist
+                        // Handle the case when the user does not exist
+                        // For example, show a login screen or redirect to sign up page
                     }
                 }
-        }
-
-
-
-
-        val addButton = findViewById<Button>(R.id.btnCreateAccount)
-        addButton.setOnClickListener {
-            check()
-        }
-
-
-        val tvTermsConditions = findViewById<TextView>(R.id.tvTermsConditions)
-        val fullText = getString(R.string.feel_free_we_do_not_ask_your_real_name_but_it_must_comply_with_the_terms_conditions)
-        val spannableString = SpannableString(fullText)
-
-        val termsStart = fullText.indexOf("Terms & Conditions")
-        val termsEnd = termsStart + "Terms & Conditions".length
-
-        val clickableSpan = object : ClickableSpan() {
-            override fun onClick(view: View) {
-                // Handle the click event here, for example, open a browser with the URL
-                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.chamberly.net/terms-and-conditions"))
-                startActivity(browserIntent)
+            } else {
+                // The user is not logged in
+                // Handle the case when the user is not logged in
+                // For example, show a login screen or redirect to sign up page
+                auth.signInAnonymously()
+                    .addOnCompleteListener(this) { task ->
+                        if (task.isSuccessful) {
+                            val user = auth.currentUser
+                            sharedPreferences.edit().putBoolean("hasLoggedIn", true).apply()
+                            Toast.makeText(this, "Welcome!${user?.uid}", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(
+                                baseContext,
+                                "Authentication failed.",
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        }
+                    }
             }
 
-            override fun updateDrawState(ds: TextPaint) {
-                super.updateDrawState(ds)
-                ds.color = Color.parseColor("#7A7AFF") // Set the color you want here
-                ds.isUnderlineText = false // Remove underline
+
+            val addButton = findViewById<Button>(R.id.btnCreateAccount)
+            addButton.setOnClickListener {
+                check()
             }
+
+
+            val tvTermsConditions = findViewById<TextView>(R.id.tvTermsConditions)
+            val fullText =
+                getString(R.string.feel_free_we_do_not_ask_your_real_name_but_it_must_comply_with_the_terms_conditions)
+            val spannableString = SpannableString(fullText)
+
+            val termsStart = fullText.indexOf("Terms & Conditions")
+            val termsEnd = termsStart + "Terms & Conditions".length
+
+            val clickableSpan = object : ClickableSpan() {
+                override fun onClick(view: View) {
+                    // Handle the click event here, for example, open a browser with the URL
+                    val browserIntent = Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://www.chamberly.net/terms-and-conditions")
+                    )
+                    startActivity(browserIntent)
+                }
+
+                override fun updateDrawState(ds: TextPaint) {
+                    super.updateDrawState(ds)
+                    ds.color = Color.parseColor("#7A7AFF") // Set the color you want here
+                    ds.isUnderlineText = false // Remove underline
+                }
+            }
+
+            spannableString.setSpan(
+                clickableSpan,
+                termsStart,
+                termsEnd,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+
+            tvTermsConditions.text = spannableString
+            tvTermsConditions.movementMethod = LinkMovementMethod.getInstance()
+            tvTermsConditions.highlightColor =
+                Color.TRANSPARENT // Optional: Remove the default click highlight color
+
         }
-
-        spannableString.setSpan(clickableSpan, termsStart, termsEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-        tvTermsConditions.text = spannableString
-        tvTermsConditions.movementMethod = LinkMovementMethod.getInstance()
-        tvTermsConditions.highlightColor = Color.TRANSPARENT // Optional: Remove the default click highlight color
-
     }
 
 
@@ -152,6 +158,7 @@ class WelcomeActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
+
 
     private fun check() {
         val user = Firebase.auth.currentUser

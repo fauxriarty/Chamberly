@@ -39,4 +39,6 @@
     <string name="username">Username</string>
     <string name="create_account">Create Account</string>
     <string name="feel_free_we_do_not_ask_your_real_name_but_it_must_comply_with_the_terms_conditions"><![CDATA[Feel free, we do not ask your real name, but it must comply with the Terms & Conditions]]></string>
+    <string name="swipe_right_to_start_chatting1">Swipe right to start chatting!</string>
+    <string name="my_chambers">My Chambers</string>
 </resources>

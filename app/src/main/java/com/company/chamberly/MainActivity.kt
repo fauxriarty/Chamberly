@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
@@ -26,11 +25,21 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val sharedPreferences = getSharedPreferences("userDetails", Context.MODE_PRIVATE)
+        val hasLoggedIn = sharedPreferences.getBoolean("hasLoggedIn", false)
+        val displayName = sharedPreferences.getString("displayName", "Anonymous")
+
+        if (!hasLoggedIn || Firebase.auth.currentUser == null ) {
+            redirectToWelcomeActivity()
+            return
+        }
+
         setContentView(R.layout.activity_main)
         checkNotificationPermission()
 
         val CreateButton = findViewById<Button>(R.id.createChamberButton)
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val areNotificationsEnabled = notificationManager.areNotificationsEnabled()
         if (!areNotificationsEnabled) {
             val intent = Intent()
@@ -39,11 +48,8 @@ class MainActivity : ComponentActivity() {
             startActivity(intent)
         }
 
-        val sharedPreferences = getSharedPreferences("userDetails", Context.MODE_PRIVATE)
-        val displayName = sharedPreferences.getString("displayName", null) ?: "Anonymous"
         val usernameTextView = findViewById<TextView>(R.id.usernameTextView)
         usernameTextView.text = displayName
-
         val profilePicButton = findViewById<ImageButton>(R.id.profilePic)
         profilePicButton.setOnClickListener {
             showProfileOptionsPopup()
@@ -52,6 +58,12 @@ class MainActivity : ComponentActivity() {
         val followUsButton = findViewById<Button>(R.id.followUs)
         followUsButton.setOnClickListener {
             openInstagramPage("https://www.instagram.com/chamberly_app/")
+        }
+
+        val myChambersButton = findViewById<ImageButton>(R.id.myChambersButton)
+        myChambersButton.setOnClickListener {
+            val intent = Intent(this, ActiveChambers::class.java)
+            startActivity(intent)
         }
 
 
@@ -94,13 +106,35 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun deleteAccount() {
+        val user = auth.currentUser
+        if (user != null) {
+            // Optional: Delete user's associated data from Firestore
 
+            user.delete().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val sharedPreferences = getSharedPreferences("userDetails", Context.MODE_PRIVATE)
+                    with(sharedPreferences.edit()) {
+                        clear()
+                        apply()
+                    }
+                    Toast.makeText(this, "Account deleted successfully", Toast.LENGTH_SHORT).show()
+                    redirectToWelcomeActivity()
+                } else {
+                    Toast.makeText(this, "Failed to delete account", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            Toast.makeText(this, "No user is signed in", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroy() {
-        onBackPressedCallback.remove()
+        if (::onBackPressedCallback.isInitialized) {
+            onBackPressedCallback.remove()
+        }
         super.onDestroy()
     }
+
     private fun isNotificationPermissionGranted(): Boolean {
         return NotificationManagerCompat.from(this).areNotificationsEnabled()
     }
@@ -109,6 +143,13 @@ class MainActivity : ComponentActivity() {
             // Notification permission is not granted, show a button to request it
             requestNotificationPermission()
         }
+    }
+
+    private fun redirectToWelcomeActivity() {
+        val intent = Intent(this, WelcomeActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
     private fun openInstagramPage(url: String) {
         try {

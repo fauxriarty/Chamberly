@@ -8,7 +8,7 @@
 
     <!-- Profile Section -->
     <LinearLayout
-        android:paddingStart="18dp"
+        android:paddingStart="16dp"
         android:id="@+id/profileSection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -135,18 +135,21 @@
         <!-- Home Button (Functional) -->
         <ImageButton
             android:id="@+id/homeButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="@null"
             android:paddingEnd="16dp"
+            android:layout_marginEnd="68.5dp"
+
             android:paddingStart="16dp"
             android:contentDescription="@string/chamberly"
             android:src="@drawable/home" />
 
         <!-- Placeholder Button (Non-functional) -->
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/myChambersButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="@null"
             android:paddingEnd="16dp"
             android:paddingStart="16dp"
