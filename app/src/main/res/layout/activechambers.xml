@@ -10,7 +10,7 @@
         android:id="@+id/tvMyChambers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="8dp"
+        android:paddingTop="12dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="@string/my_chambers"
@@ -29,7 +29,7 @@
         android:layout_height="48dp"
         android:layout_alignTop="@id/tvMyChambers"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="1dp"
+        android:layout_marginTop="3dp"
         android:layout_marginEnd="8dp"
         android:background="@drawable/ic_add"
         android:contentDescription="@string/create_a_chamber" />
@@ -40,8 +40,8 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/tvMyChambers"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="1dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="6dp"
         android:background="@drawable/profile_pic"
         android:contentDescription="@string/chamberly"
         tools:ignore="TouchTargetSizeCheck" />

@@ -36,7 +36,7 @@
             android:name=".SearchActivity"
             android:exported="false"
             android:label="@string/title_activity_search"
-            android:theme="@style/Theme.Chamberly" />
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".ChatActivity"
             android:exported="false"

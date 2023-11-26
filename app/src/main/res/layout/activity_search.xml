@@ -7,18 +7,17 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     android:clipToPadding="false">
-<!--
+
     <ImageButton
     android:id="@+id/backButton"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_alignParentStart="true"
-    android:layout_marginStart="4dp"
-    android:layout_marginTop="2dp"
+    android:layout_marginTop="6dp"
     android:background="?attr/selectableItemBackgroundBorderless"
     android:contentDescription="@string/app_name"
     android:padding="16dp"
-    android:src="@drawable/ic_back" /> -->
+    android:src="@drawable/ic_back" />
 
     <TextView
         android:id="@+id/textView"

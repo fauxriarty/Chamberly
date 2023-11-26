@@ -57,12 +57,12 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
             koloda.onClickRight()
         }
 
-       // val backButton: ImageButton = findViewById(R.id.backButton)
-        //backButton.setOnClickListener {
+        val backButton: ImageButton = findViewById(R.id.backButton)
+        backButton.setOnClickListener {
             // Explicitly start MainActivity
-         //   val intent = Intent(this, MainActivity::class.java)
-          //  startActivity(intent)
-       // }
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
 
 
         onBackPressedCallback = object : OnBackPressedCallback(true) {
