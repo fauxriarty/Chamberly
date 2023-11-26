@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
 
         val myChambersButton = findViewById<ImageButton>(R.id.myChambersButton)
         myChambersButton.setOnClickListener {
-            val intent = Intent(this, ActiveChambers::class.java)
+            val intent = Intent(this, ActiveChambersActivity::class.java)
             startActivity(intent)
         }
 
