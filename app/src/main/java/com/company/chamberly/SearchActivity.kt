@@ -5,7 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import com.google.firebase.auth.ktx.auth
@@ -29,6 +31,31 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
     private var isFirstTimeEmpty = true
     private var lastTimestamp: Any? = null
     private lateinit var onBackPressedCallback: OnBackPressedCallback
+
+
+    override fun onCardDrag(position: Int, cardView: View, progress: Float) {
+        // Get references to the overlay views
+        val rightSwipeOverlay = cardView.findViewById<TextView>(R.id.rightSwipeOverlay)
+        val leftSwipeOverlay = cardView.findViewById<TextView>(R.id.leftSwipeOverlay)
+
+        // Based on the progress float, determine the visibility of the overlays
+        if(progress==0f){
+            rightSwipeOverlay.visibility= View.INVISIBLE
+            leftSwipeOverlay.visibility=View.INVISIBLE
+        }
+        else if (progress > 0) { // Assuming positive progress indicates a right swipe
+            rightSwipeOverlay.visibility = View.VISIBLE
+            leftSwipeOverlay.visibility = View.INVISIBLE
+        } else if (progress < 0) { // Assuming negative progress indicates a left swipe
+            rightSwipeOverlay.visibility = View.INVISIBLE
+            leftSwipeOverlay.visibility = View.VISIBLE
+        } else { // No significant swipe, hide both overlays
+            rightSwipeOverlay.visibility = View.INVISIBLE
+            leftSwipeOverlay.visibility = View.INVISIBLE
+        }
+
+        super.onCardDrag(position, cardView, progress)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -250,6 +277,7 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
                     }
             }
     }
+
 
     override fun onDestroy() {
         releaseCards()

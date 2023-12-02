@@ -33,10 +33,19 @@ class ChamberAdapter(private val context: Context) : BaseAdapter() {
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_koloda, parent, false)
+        val view = convertView ?: LayoutInflater.from(parent.context).inflate(R.layout.item_koloda, parent, false)
         val textTitle: TextView = view.findViewById(R.id.textTitle)
+        val rightSwipeOverlay: TextView = view.findViewById(R.id.rightSwipeOverlay)
+        val leftSwipeOverlay: TextView = view.findViewById(R.id.leftSwipeOverlay)
+
         val chamber = getItem(position)
         textTitle.text = "\"${chamber.groupTitle}\""
+
+        // Initial state of overlays should be invisible
+        rightSwipeOverlay.visibility = View.INVISIBLE
+        leftSwipeOverlay.visibility = View.INVISIBLE
+
         return view
     }
+
 }
