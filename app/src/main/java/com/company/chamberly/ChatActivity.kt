@@ -380,15 +380,15 @@ class ChatActivity : ComponentActivity(){
         val annoyingButton = dialog.findViewById<Button>(R.id.buttonAnnoying)
 
         harassmentButton.setOnClickListener {
-            reportUser(message, "harassment")
+            reportUser(message, "Harassment")
             dialog.dismiss()
         }
         inappropriateBehaviorButton.setOnClickListener {
-            reportUser(message, "inappropriate behavior")
+            reportUser(message, "Inappropriate Behavior")
             dialog.dismiss()
         }
         unsupportiveBehaviorButton.setOnClickListener {
-            reportUser(message, "unsupportive behavior")
+            reportUser(message, "Unsupportive Behavior")
             dialog.dismiss()
         }
         spammingButton.setOnClickListener {

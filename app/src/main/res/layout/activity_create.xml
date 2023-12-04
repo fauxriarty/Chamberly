@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#e6e6ff"
+    android:background="@color/white"
     tools:context=".CreateActivity">
 
     <TextView
@@ -14,7 +14,7 @@
         android:layout_marginTop="20dp"
         android:text="@string/start_a_chat"
         android:textColor="#616161"
-        android:textSize="14sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
