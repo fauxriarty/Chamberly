@@ -44,4 +44,5 @@
     <string name="skip_the_chamber">Skip the Chamber</string>
     <string name="join_the_chamber">Join the Chamber  </string>
     <string name="joinchamber"><![CDATA[Join the Chamber   ]]></string>
+    <string name="you_do_not_have_any_chambers_yet">You do not have any Chambers yet</string>
 </resources>

@@ -4,15 +4,20 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
+import android.widget.Button
 import android.widget.ImageButton
+import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class ActiveChambersActivity : AppCompatActivity() {
     private val auth = Firebase.auth
-
+    private val firestore = Firebase.firestore
 
     // Using View Binding to reference the views
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,16 +25,22 @@ class ActiveChambersActivity : AppCompatActivity() {
         setContentView(R.layout.activechambers)
         val homeButton = findViewById<ImageButton>(R.id.homeButton)
 
-        // Set an OnClickListener on the home button
+        val recyclerView = findViewById<RecyclerView>(R.id.rvChambers)
+        val emptyStateView = findViewById<RelativeLayout>(R.id.emptyStateView)
+
+        checkForActiveChambers { hasActiveChambers ->
+            if (hasActiveChambers) {
+                recyclerView.visibility = View.VISIBLE
+                emptyStateView.visibility = View.GONE
+            } else {
+                recyclerView.visibility = View.GONE
+                emptyStateView.visibility = View.VISIBLE
+            }
+        }
+
         homeButton.setOnClickListener {
-            // Create an Intent to start MainActivity
             val intent = Intent(this, MainActivity::class.java)
-            // Start the MainActivity
             startActivity(intent)
-            // Optionally, if you want to clear the activity stack:
-            // intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-            // Optionally, if you want to finish the current activity:
-            // finish()
         }
 
         val profilePicButton = findViewById<ImageButton>(R.id.btnProfilePic)
@@ -37,12 +48,22 @@ class ActiveChambersActivity : AppCompatActivity() {
             showProfileOptionsPopup()
         }
 
+        val btnFindChamber = findViewById<Button>(R.id.btnFindChamber)
+        val btnCreateChamber = findViewById<Button>(R.id.btnCreateChamber)
+        btnFindChamber.setOnClickListener {
+            goToSearchActivity()
+        }
+
+        btnCreateChamber.setOnClickListener {
+            goToCreateActivity()
+        }
+
     }
 
     private fun showProfileOptionsPopup() {
         val options = arrayOf("Delete Account", "Show Privacy Policy")
         val builder = AlertDialog.Builder(this)
-        builder.setItems(options) { dialog, which ->
+        builder.setItems(options) { _, which ->
             when (which) {
                 0 -> deleteAccount() // Delete account option
                 1 -> showPrivacyPolicy() // Show privacy policy option
@@ -84,6 +105,34 @@ class ActiveChambersActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+    }
+
+    private fun checkForActiveChambers(callback: (Boolean) -> Unit) {
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            firestore.collection("chambers")
+                .whereArrayContains("members", userId)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    callback(!querySnapshot.isEmpty) // True if the user is in any chambers
+                }
+                .addOnFailureListener { exception ->
+                    Toast.makeText(this, "Error checking active chambers: ${exception.message}", Toast.LENGTH_SHORT).show()
+                    callback(false) // Handle the error case
+                }
+        } else {
+            callback(false) // No user logged in
+        }
+    }
+
+    private fun goToSearchActivity() {
+        val intent = Intent(this, SearchActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun goToCreateActivity() {
+        val intent = Intent(this, CreateActivity::class.java)
+        startActivity(intent)
     }
 
 

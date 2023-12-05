@@ -54,6 +54,64 @@
         android:layout_marginTop="20dp"
         android:scrollbars="vertical" />
 
+    <RelativeLayout
+        android:id="@+id/emptyStateView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:layout_below="@id/tvMyChambers">
+
+    <ImageView
+        android:id="@+id/imgEmptyState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="160dp"
+        android:src="@drawable/emptystate" />
+
+    <!-- TextView for no chambers message -->
+    <TextView
+        android:id="@+id/txtNoChambers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imgEmptyState"
+        android:textColor="#B0B0CA"
+        android:layout_marginTop="30dp"
+        android:textSize="18sp"
+        android:layout_centerHorizontal="true"
+        android:text="@string/you_do_not_have_any_chambers_yet"
+        android:gravity="center" />
+
+    <!-- Button to find a chamber -->
+    <Button
+        android:id="@+id/btnFindChamber"
+        android:layout_width="297dp"
+        android:textColor="@color/white"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/txtNoChambers"
+
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:text="@string/find_a_chamber"
+        android:background="@drawable/bg_button_placeholder" />
+
+    <Button
+        android:id="@+id/btnCreateChamber"
+        android:layout_width="297dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btnFindChamber"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:textColor="@color/white"
+        android:text="@string/create_a_chamber"
+        android:background="@drawable/bg_button_placeholder" />
+
+    </RelativeLayout>
+
 
     <LinearLayout
         android:id="@+id/bottomButtonBar"
