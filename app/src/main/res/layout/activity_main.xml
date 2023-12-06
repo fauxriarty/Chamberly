@@ -8,13 +8,13 @@
 
     <!-- Profile Section -->
     <LinearLayout
-        android:paddingStart="16dp"
+        android:paddingStart="10dp"
         android:id="@+id/profileSection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="85dp"
+        android:layout_marginEnd="84dp"
         android:orientation="horizontal"
         android:paddingTop="24dp">
 
@@ -24,7 +24,8 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:paddingTop="1dp"
-            android:paddingEnd="2dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="3dp"
             android:contentDescription="@string/chamberly"
             android:src="@drawable/profile_pic"
             tools:ignore="TouchTargetSizeCheck" />

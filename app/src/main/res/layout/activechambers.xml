@@ -14,7 +14,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="@string/my_chambers"
-        android:textSize="24sp"
+        android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="#2E2E5B" />
 
@@ -36,12 +36,12 @@
 
     <ImageButton
         android:id="@+id/btnProfilePic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_alignTop="@id/tvMyChambers"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="6dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/profile_pic"
         android:contentDescription="@string/chamberly"
         tools:ignore="TouchTargetSizeCheck" />
