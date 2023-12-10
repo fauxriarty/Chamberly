@@ -5,11 +5,13 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -87,6 +89,8 @@ class ChatActivity : ComponentActivity(){
         recyclerView.adapter = messageAdapter
 
 
+
+
         //load cache file
         cacheFile = File(this.cacheDir, groupChatId)
         if(cacheFile.exists()){
@@ -99,6 +103,14 @@ class ChatActivity : ComponentActivity(){
             messages= Gson().fromJson(content, type)
             messageAdapter.notifyDataSetChanged()    // update the UI
         }
+
+        val backButton: ImageButton = findViewById(R.id.backButton)
+        backButton.setOnClickListener {
+            // Explicitly start MainActivity
+            val intent = Intent(this, ActiveChambersActivity::class.java)
+            startActivity(intent)
+        }
+
         val messagesRef = database.getReference(groupChatId).child("messages")
         messagesRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {

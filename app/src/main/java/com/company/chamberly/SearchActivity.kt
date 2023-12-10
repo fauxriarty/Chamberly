@@ -257,26 +257,34 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
         val authorUID = sharedPreferences.getString("uid", currentUser?.uid)
         val authorName = sharedPreferences.getString("displayName", "Anonymous")
         val chamberDataRef = database.reference.child(chamber.groupChatId)
-        val message = Message(authorUID!!, "$authorName user joined and chamber auto-locked", "text", authorName!!)
-        chamberDataRef.child("messages").push().setValue(message)
+
+        // New system message for user join
+        val systemMessage1 = Message("Chamberly", "$authorName joined the chat. \n\nPlease be patient for others to respond :)", "system", "Chamberly")
+
+        // Add system message to messages in the database
+        chamberDataRef.child("messages").push().setValue(systemMessage1)
             .addOnSuccessListener {
-                chamberDataRef.child("Users").child("members").child(authorUID).setValue(authorName)
-                    .addOnSuccessListener {
-                        firestore.collection("GroupChatIds").document(chamber.groupChatId).update("locked" , true)
-                            .addOnSuccessListener{
-                                val intent = Intent(this@SearchActivity, ChatActivity::class.java)
-                                //TODO : pass chamber object to ChatActivity
-                                //intent.putExtra("chamber", chamber)
-                                intent.putExtra("groupChatId", chamber.groupChatId)
-                                intent.putExtra("groupTitle", chamber.groupTitle)
-                                intent.putExtra("authorName",chamber.authorName)
-                                intent.putExtra("authorUID",chamber.authorUID)
-                                startActivity(intent)
-                                finish()
-                            }
-                    }
+                // Add user to members
+                if (authorUID != null) {
+                    chamberDataRef.child("Users").child("members").child(authorUID).setValue(authorName)
+                        .addOnSuccessListener {
+                            // Lock the chamber
+                            firestore.collection("GroupChatIds").document(chamber.groupChatId).update("locked" , true)
+                                .addOnSuccessListener{
+                                    // Start ChatActivity
+                                    val intent = Intent(this@SearchActivity, ChatActivity::class.java)
+                                    intent.putExtra("groupChatId", chamber.groupChatId)
+                                    intent.putExtra("groupTitle", chamber.groupTitle)
+                                    intent.putExtra("authorName",chamber.authorName)
+                                    intent.putExtra("authorUID",chamber.authorUID)
+                                    startActivity(intent)
+                                    finish()
+                                }
+                        }
+                }
             }
     }
+
 
 
     override fun onDestroy() {
