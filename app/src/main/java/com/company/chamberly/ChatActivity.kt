@@ -6,6 +6,7 @@ import android.content.ClipboardManager
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
+import android.media.Image
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
@@ -88,7 +89,12 @@ class ChatActivity : ComponentActivity(){
         })
         recyclerView.adapter = messageAdapter
 
+        val infoButton = findViewById<ImageButton>(R.id.infoButton)
 
+
+        infoButton.setOnClickListener{
+            showInfoDialog()
+        }
 
 
         //load cache file
@@ -149,11 +155,6 @@ class ChatActivity : ComponentActivity(){
 
         // Find the information bar
         val infoBar = findViewById<LinearLayout>(R.id.infoBar)
-
-        // Set click listener for the information bar
-        infoBar.setOnClickListener {
-            showInfoDialog()
-        }
 
         val titleTextView = findViewById<TextView>(R.id.groupTitle)
         titleTextView.text = groupTitle
@@ -435,6 +436,9 @@ class ChatActivity : ComponentActivity(){
         if(UID==authorUID)
         {
             dialog.show()
+        }else{
+            exitChat(groupChatId)
+            goToMainActivity()
         }
 
     }
@@ -447,12 +451,18 @@ class ChatActivity : ComponentActivity(){
                 firestore.collection("GroupChatIds").document(groupChatId).delete()
                     .addOnSuccessListener {
                         Toast.makeText(this, "Chamber deleted", Toast.LENGTH_SHORT).show()
-                        finish()
+                        goToMainActivity()
                     }
             }
             .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
 
     }
+
+    private fun goToMainActivity() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+    }
+
 
     private fun sendNotification(message: Message,currSendToken:String) {
         val uid = message.UID

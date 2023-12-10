@@ -8,10 +8,12 @@
         android:id="@+id/btn_delete_chamber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="delete chamber"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:padding="16dp" />
+        android:background="@drawable/rounded_button"
+        android:padding="16dp"
+        android:text="@string/delete_chamber"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
 
 </LinearLayout>

@@ -27,6 +27,7 @@ class ActiveChambersActivity : AppCompatActivity() {
 
         val recyclerView = findViewById<RecyclerView>(R.id.rvChambers)
         val emptyStateView = findViewById<RelativeLayout>(R.id.emptyStateView)
+        val addchamber = findViewById<ImageButton>(R.id.btnAddChamber)
 
         checkForActiveChambers { hasActiveChambers ->
             if (hasActiveChambers) {
@@ -47,6 +48,11 @@ class ActiveChambersActivity : AppCompatActivity() {
         profilePicButton.setOnClickListener {
             showProfileOptionsPopup()
         }
+
+        addchamber.setOnClickListener{
+            goToCreateActivity()
+        }
+
 
         val btnFindChamber = findViewById<Button>(R.id.btnFindChamber)
         val btnCreateChamber = findViewById<Button>(R.id.btnCreateChamber)

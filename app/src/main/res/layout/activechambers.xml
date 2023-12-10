@@ -20,9 +20,6 @@
 
     <!-- Add Chamber Button at the right end of the screen, same line as TextView -->
 
-    <!-- Profile Pic Button at the left end of the screen, same line as TextView -->
-
-
     <ImageButton
         android:id="@+id/btnAddChamber"
         android:layout_width="48dp"
