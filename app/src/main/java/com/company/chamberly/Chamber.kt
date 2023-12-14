@@ -14,5 +14,6 @@ data class Chamber(
     //val locked: Boolean = false, // Set to false
     val membersLimit: Int = 2, // Set to 2
     val publishedPool: Boolean = true, // Set to true
+    var lastMessage: String = "" , // To store the last message of the chat
     val timestamp: Any = FieldValue.serverTimestamp() // Timestamp of chamber creation
 ): Serializable

@@ -122,6 +122,9 @@ class ChatActivity : ComponentActivity(){
             override fun onDataChange(snapshot: DataSnapshot) {
                 messages.clear() //clear the list
 
+                var lastMsg = ""
+
+
                 for (childSnapshot in snapshot.children) {
                     if (childSnapshot.exists()) {
                         val messageValue = childSnapshot.value
@@ -136,8 +139,14 @@ class ChatActivity : ComponentActivity(){
                                 messages.add(message)
                             }
                         }
+
+
+
                     }
+                    lastMsg = childSnapshot.getValue(Message::class.java)?.message_content ?: ""
                 }
+
+                updateChamberLastMessage(groupChatId, lastMsg)
 
                 //save the data to the cache file with groupChatId as the file name
                 val content = Gson().toJson(messages)
@@ -250,6 +259,14 @@ class ChatActivity : ComponentActivity(){
         Log.e("Holder", "Holder successfully copied: ${message.message_content}")
 
     }
+
+    private fun updateChamberLastMessage(groupChatId: String, lastMsg: String) {
+        val chamberRef = firestore.collection("chambers").document(groupChatId)
+        chamberRef.update("lastMessage", lastMsg)
+            .addOnSuccessListener { Log.d("ChatActivity", "Last message updated") }
+            .addOnFailureListener { e -> Log.w("ChatActivity", "Error updating last message", e) }
+    }
+
     // report user
     private  fun reportUser(message: Message, reason: String){
         // Todo: get chamber info early
