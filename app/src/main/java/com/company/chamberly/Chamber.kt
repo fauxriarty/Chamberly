@@ -17,3 +17,4 @@ data class Chamber(
     var lastMessage: String = "" , // To store the last message of the chat
     val timestamp: Any = FieldValue.serverTimestamp() // Timestamp of chamber creation
 ): Serializable
+

@@ -120,40 +120,33 @@ class ChatActivity : ComponentActivity(){
         val messagesRef = database.getReference(groupChatId).child("messages")
         messagesRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                messages.clear() //clear the list
+                messages.clear() // Clear the list
 
                 var lastMsg = ""
 
-
                 for (childSnapshot in snapshot.children) {
-                    if (childSnapshot.exists()) {
-                        val messageValue = childSnapshot.value
-                        if (messageValue != null && messageValue is Map<*, *>) {
-                            val uid = messageValue["uid"] as? String
-                            val messageContent = messageValue["message_content"] as? String
-                            val messageType = messageValue["message_type"] as? String
-                            val senderName = messageValue["sender_name"] as? String
-
-                            if (uid != null && messageContent != null && messageType != null && senderName != null) {
-                                val message = Message(uid, messageContent, messageType, senderName)
+                    // Check if the data can be converted to a Message object
+                    if (childSnapshot.getValue() is Map<*, *>) {
+                        try {
+                            val message = childSnapshot.getValue(Message::class.java)
+                            if (message != null) {
                                 messages.add(message)
+                                lastMsg = message.message_content
                             }
+                        } catch (e: Exception) {
+                            Log.e("ChatActivity", "Error parsing message: ${e.message}")
                         }
-
-
-
                     }
-                    lastMsg = childSnapshot.getValue(Message::class.java)?.message_content ?: ""
                 }
 
                 updateChamberLastMessage(groupChatId, lastMsg)
 
-                //save the data to the cache file with groupChatId as the file name
+                // Save data to cache and update UI
                 val content = Gson().toJson(messages)
                 this@ChatActivity.openFileOutput(groupChatId, Context.MODE_PRIVATE).use {
                     it.write(content.toByteArray())
                 }
-                messageAdapter.setMessages(messages) // using new messages
+                messageAdapter.setMessages(messages)
                 recyclerView.scrollToPosition(messages.size - 1)
             }
 
@@ -161,6 +154,8 @@ class ChatActivity : ComponentActivity(){
                 Log.e("ChatActivity", "Error fetching messages: ${error.message}")
             }
         })
+
+
 
         // Find the information bar
         val infoBar = findViewById<LinearLayout>(R.id.infoBar)
