@@ -226,19 +226,43 @@ class ChatActivity : ComponentActivity(){
 
 
 
-    fun exitChat(groupChatId: String){
+    private fun exitChat(groupChatId: String) {
         val userUID = FirebaseAuth.getInstance().currentUser?.uid
 
-        //TODO: notify other user (with a system message maybe) that this user has left the chat and the chamber has been deleted
+        // Send a system message indicating that the user is leaving
+        sendExitSystemMessage(groupChatId, userUID)
 
+        // Remove the user from the chamber's member list in Firestore
         firestore.collection("GroupChatIds").document(groupChatId)
             .update("members", FieldValue.arrayRemove(userUID))
             .addOnSuccessListener {
-                goToMainActivity()
+                // Check if the chamber should be deleted
+                checkAndHandleChamberDeletion(groupChatId)
             }
     }
 
-    // Menu functions
+    // Function to send a system message about user exit
+    private fun sendExitSystemMessage(groupChatId: String, userUID: String?) {
+        val exitMessage = userUID?.let {
+            Message("system", "Your companion has exited the chat.", "system",
+                "Chamberly",
+
+            )
+        }
+        database.getReference(groupChatId).child("messages").push().setValue(exitMessage)
+    }
+
+    // Function to check and handle the deletion of the chamber if necessary
+    private fun checkAndHandleChamberDeletion(groupChatId: String) {
+        firestore.collection("GroupChatIds").document(groupChatId).get()
+            .addOnSuccessListener { documentSnapshot ->
+                val members = documentSnapshot["members"] as? List<*>
+                if (members.isNullOrEmpty()) {
+                    deleteChamber(groupChatId)
+                }
+            }
+    }
+
     // copy message
     private fun copyMessage(message: Message) {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -461,11 +485,20 @@ class ChatActivity : ComponentActivity(){
             }
             .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
 
+        // Delete from Firestore
+        firestore.collection("GroupChatIds").document(groupChatId).delete()
+
+        // Delete from Realtime Database
+        database.getReference(groupChatId).removeValue()
+
+        // Go back to the main activity
+        goToMainActivity()
     }
 
     private fun goToMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
+        finish()
     }
 
 
