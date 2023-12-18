@@ -227,23 +227,15 @@ class ChatActivity : ComponentActivity(){
 
 
     fun exitChat(groupChatId: String){
-        lateinit var authorUID : String
-        firestore.collection("GroupChatIds").document(groupChatId).get().addOnSuccessListener {
-            val authorUID = it.getString("authorUID") ?: return@addOnSuccessListener
-            // TODO: disconnect from the firebase
-            //finish()    // alternative: exit the chat
-            if(authorUID != auth.currentUser!!.uid){
-                // delete the group chat id from the user's list
-                database.reference.child(groupChatId).child("Users").child("members").child(auth.currentUser!!.uid).removeValue()
-                    .addOnSuccessListener {
-                        finish()
-                    }
+        val userUID = FirebaseAuth.getInstance().currentUser?.uid
 
+        //TODO: notify other user (with a system message maybe) that this user has left the chat and the chamber has been deleted
+
+        firestore.collection("GroupChatIds").document(groupChatId)
+            .update("members", FieldValue.arrayRemove(userUID))
+            .addOnSuccessListener {
+                goToMainActivity()
             }
-            else{
-                finish()
-            }
-        }
     }
 
     // Menu functions
