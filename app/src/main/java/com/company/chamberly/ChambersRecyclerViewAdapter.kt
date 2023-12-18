@@ -26,8 +26,10 @@ class ChambersRecyclerViewAdapter(private val onItemClick: (Chamber) -> Unit) : 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val chamber = dataList[position]
         holder.textTitle.text = chamber.groupTitle
+        holder.tvLastMessage.text = chamber.lastMessage // assuming 'lastMessage' is a String in Chamber
         holder.itemView.setOnClickListener { onItemClick(chamber) }
     }
+
 
     override fun getItemCount(): Int {
         return dataList.size

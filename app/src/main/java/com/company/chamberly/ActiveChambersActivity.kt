@@ -12,15 +12,18 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class ActiveChambersActivity : AppCompatActivity() {
     private val auth = Firebase.auth
     private val firestore = Firebase.firestore
+    private val database = Firebase.database        // realtime database
 
 
     // Using View Binding to reference the views
@@ -56,23 +59,6 @@ class ActiveChambersActivity : AppCompatActivity() {
                 emptyStateView.visibility = View.VISIBLE
             }
         }
-
-        //todo: check if user is in any chambers
-        //todo: if user is in any chambers, show the chambers
-        //todo: if user is not in any chambers, show the empty state view
-
-        //todo: uncomment this function call once you've implemented the above
-       /*checkForActiveChambers { hasActiveChambers ->
-            if (hasActiveChambers) {
-                recyclerView.visibility = View.VISIBLE
-                emptyStateView.visibility = View.GONE
-            } else {
-                recyclerView.visibility = View.GONE
-                emptyStateView.visibility = View.VISIBLE
-            }
-        }*/
-
-
 
         homeButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -110,7 +96,7 @@ class ActiveChambersActivity : AppCompatActivity() {
                 .get()
                 .addOnSuccessListener { querySnapshot ->
                     val chambers = querySnapshot.documents.mapNotNull { it.toObject(Chamber::class.java) }
-                    callback(chambers)
+                    fetchLastMessagesForChambers(chambers, callback)
                 }
                 .addOnFailureListener { exception ->
                     Toast.makeText(this, "Error fetching chambers: ${exception.message}", Toast.LENGTH_SHORT).show()
@@ -120,6 +106,29 @@ class ActiveChambersActivity : AppCompatActivity() {
             callback(emptyList()) // No user logged in
         }
     }
+
+
+    private fun fetchLastMessagesForChambers(chambers: List<Chamber>, callback: (List<Chamber>) -> Unit) {
+        val lastMessageTasks = chambers.map { chamber ->
+            fetchLastMessageForChamber(chamber)
+        }
+
+        Tasks.whenAllSuccess<DataSnapshot>(lastMessageTasks)
+            .addOnSuccessListener { lastMessages ->
+                lastMessages.forEachIndexed { index, dataSnapshot ->
+                    val lastMessage = dataSnapshot.children.firstOrNull()?.getValue(Message::class.java)
+                    chambers[index].lastMessage = lastMessage?.message_content ?: "No messages"
+                }
+                callback(chambers)
+            }
+    }
+
+    private fun fetchLastMessageForChamber(chamber: Chamber): Task<DataSnapshot> {
+        return database.reference.child(chamber.groupChatId)
+            .child("messages").orderByKey().limitToLast(1).get()
+    }
+
+
 
 
 
@@ -170,25 +179,6 @@ class ActiveChambersActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
-
-    private fun checkForActiveChambers(callback: (Boolean) -> Unit) {
-        val userId = auth.currentUser?.uid
-        if (userId != null) {
-            firestore.collection("chambers")
-                .whereArrayContains("members", userId)
-                .get()
-                .addOnSuccessListener { querySnapshot ->
-                    callback(!querySnapshot.isEmpty) // True if the user is in any chambers
-                }
-                .addOnFailureListener { exception ->
-                    Toast.makeText(this, "Error checking active chambers: ${exception.message}", Toast.LENGTH_SHORT).show()
-                    callback(false) // Handle the error case
-                }
-        } else {
-            callback(false) // No user logged in
-        }
-    }
-
 
 
     private fun goToSearchActivity() {
