@@ -4,18 +4,15 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputFilter
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import com.google.firebase.FirebaseApp
-import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.Logger
-import com.google.firebase.database.ktx.database
+import com.google.firebase.firestore.FieldValue
+
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -23,6 +20,8 @@ class CreateActivity : ComponentActivity() {
     private lateinit var onBackPressedCallback: OnBackPressedCallback
     private val auth = Firebase.auth
     private val database = Firebase.firestore
+    private val firestore = Firebase.firestore      // firestore
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,8 +73,21 @@ class CreateActivity : ComponentActivity() {
                         val timestamp = System.currentTimeMillis() / 1000 // Convert to seconds
                         chamberDataRef.child("timestamp").setValue(timestamp)
 
+
+                        firestore.collection("GroupChatIds").document(chamber.groupChatId)
+                            .update("members", FieldValue.arrayUnion(authorUID))
+
                         // Set "Title" data
                         chamberDataRef.child("Title").setValue(chamber.groupTitle)
+
+                        val userRef = firestore.collection("Users").document(authorUID!!)
+                        userRef.update("chambers", FieldValue.arrayUnion(chamber.groupChatId))
+                            .addOnSuccessListener {
+                                // Handle success
+                            }
+                            .addOnFailureListener {
+                                // Handle error
+                            }
 
                         // Set "Users" data
                         val usersRef = chamberDataRef.child("Users")

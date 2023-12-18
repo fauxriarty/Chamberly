@@ -10,10 +10,11 @@ import android.widget.ImageButton
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -28,17 +29,40 @@ class ActiveChambersActivity : AppCompatActivity() {
         setContentView(R.layout.activechambers)
         val homeButton = findViewById<ImageButton>(R.id.homeButton)
 
-        val recyclerView = findViewById<RecyclerView>(R.id.rvChambers)
         val emptyStateView = findViewById<RelativeLayout>(R.id.emptyStateView)
         val addchamber = findViewById<ImageButton>(R.id.btnAddChamber)
 
+
+        val recyclerView = findViewById<RecyclerView>(R.id.rvChambers)
+        val adapter = ChambersRecyclerViewAdapter { chamber ->
+            // Handle click, navigate to ChatActivity
+            val intent = Intent(this, ChatActivity::class.java).apply {
+                putExtra("groupChatId", chamber.groupChatId)
+                putExtra("groupTitle", chamber.groupTitle)
+                // Add other necessary data
+            }
+            startActivity(intent)
+        }
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        // Fetch chambers and update RecyclerView
+        fetchChambers { chambers ->
+            if (chambers.isNotEmpty()) {
+                adapter.updateChambers(chambers)
+                recyclerView.visibility = View.VISIBLE
+                emptyStateView.visibility = View.GONE
+            } else {
+                recyclerView.visibility = View.GONE
+                emptyStateView.visibility = View.VISIBLE
+            }
+        }
 
         //todo: check if user is in any chambers
         //todo: if user is in any chambers, show the chambers
         //todo: if user is not in any chambers, show the empty state view
 
         //todo: uncomment this function call once you've implemented the above
-       /* checkForActiveChambers { hasActiveChambers ->
+       /*checkForActiveChambers { hasActiveChambers ->
             if (hasActiveChambers) {
                 recyclerView.visibility = View.VISIBLE
                 emptyStateView.visibility = View.GONE
@@ -46,7 +70,7 @@ class ActiveChambersActivity : AppCompatActivity() {
                 recyclerView.visibility = View.GONE
                 emptyStateView.visibility = View.VISIBLE
             }
-        } */
+        }*/
 
 
 
@@ -64,43 +88,6 @@ class ActiveChambersActivity : AppCompatActivity() {
             goToCreateActivity()
         }
 
-        val sampleChambers = mutableListOf(
-            Chamber(groupTitle = "Sample Chamber 1", lastMessage = "Last message from Chamber 1"),
-            Chamber(groupTitle = "Sample Chamber 2", lastMessage = "Last message from Chamber 2"),
-            Chamber(groupTitle = "Sample Chamber 3", lastMessage = "Last message from Chamber 3"),
-
-            // Add more sample chambers as needed
-        )
-
-        // for showing the sample chambers
-        val adapter = SampleChamberAdapter(sampleChambers)
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.visibility = View.VISIBLE
-        emptyStateView.visibility = View.GONE
-
-        val swipeToDeleteCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-                return false // No move functionality
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                val chamberToDelete = sampleChambers[position]
-
-                if (chamberToDelete.groupChatId.isNotBlank()) {
-                    deleteChamber(chamberToDelete.groupChatId)
-                }
-
-                // Remove the chamber from the list and update the RecyclerView
-                sampleChambers.removeAt(position)
-                adapter.notifyItemRemoved(position)
-            }
-        }
-
-        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
-
 
         val btnFindChamber = findViewById<Button>(R.id.btnFindChamber)
         val btnCreateChamber = findViewById<Button>(R.id.btnCreateChamber)
@@ -113,6 +100,29 @@ class ActiveChambersActivity : AppCompatActivity() {
         }
 
     }
+
+
+    private fun fetchChambers(callback: (List<Chamber>) -> Unit) {
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            firestore.collection("GroupChatIds")
+                .whereArrayContains("members", userId)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    val chambers = querySnapshot.documents.mapNotNull { it.toObject(Chamber::class.java) }
+                    callback(chambers)
+                }
+                .addOnFailureListener { exception ->
+                    Toast.makeText(this, "Error fetching chambers: ${exception.message}", Toast.LENGTH_SHORT).show()
+                    callback(emptyList())
+                }
+        } else {
+            callback(emptyList()) // No user logged in
+        }
+    }
+
+
+
 
     private fun showProfileOptionsPopup() {
         val options = arrayOf("Delete Account", "Show Privacy Policy")
@@ -179,17 +189,6 @@ class ActiveChambersActivity : AppCompatActivity() {
         }
     }
 
-    private fun deleteChamber(groupChatId: String) {
-        // Attempt to delete the chamber from Firestore
-        firestore.collection("chambers").document(groupChatId)
-            .delete()
-            .addOnSuccessListener {
-                Toast.makeText(this, "Chamber deleted successfully", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error deleting chamber: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-    }
 
 
     private fun goToSearchActivity() {

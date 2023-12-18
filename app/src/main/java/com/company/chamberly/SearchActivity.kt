@@ -12,6 +12,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -65,7 +66,7 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
         koloda.kolodaListener = this
 
         // set adapter
-        adapter = ChamberAdapter(this)
+        adapter = ChamberAdapter()
         koloda.adapter =  adapter
 
 
@@ -261,6 +262,9 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
         // New system message for user join
         val systemMessage1 = Message("Chamberly", "$authorName joined the chat. \n\nPlease be patient for others to respond :)", "system", "Chamberly")
 
+        firestore.collection("GroupChatIds").document(chamber.groupChatId)
+            .update("locked", true, "members", FieldValue.arrayUnion(authorUID))
+
         // Add system message to messages in the database
         chamberDataRef.child("messages").push().setValue(systemMessage1)
             .addOnSuccessListener {
@@ -279,11 +283,22 @@ class SearchActivity : ComponentActivity() ,KolodaListener{
                                     intent.putExtra("authorUID",chamber.authorUID)
                                     startActivity(intent)
                                     finish()
+
+                                    // Update user document with the new chamber ID in Firestore
+                                    val userRef = firestore.collection("Users").document(authorUID)
+                                    userRef.update("chambers",  FieldValue.arrayUnion(chamber.groupChatId))
+                                        .addOnSuccessListener {
+                                            // Successfully updated user's chamber list
+                                        }
+                                        .addOnFailureListener { e ->
+                                            // Handle error in updating the chamber list
+                                        }
                                 }
                         }
                 }
             }
     }
+
 
 
 

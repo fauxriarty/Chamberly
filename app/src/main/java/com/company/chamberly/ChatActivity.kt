@@ -71,10 +71,11 @@ class ChatActivity : ComponentActivity(){
 
         messageAdapter = MessageAdapter(uid!!) // create message adapter
         //chamber = intent.getSerializableExtra("chamber") as Chamber // get chamber
-        groupChatId = intent.getStringExtra("groupChatId") as String// get group chat id
-        groupTitle = intent.getStringExtra("groupTitle") as String   // get group chat title
-        authorName = intent.getStringExtra("authorName") as String  // get author name
-        authorUID = intent.getStringExtra("authorUID") as String    // get authorUID
+        groupChatId = intent.getStringExtra("groupChatId") ?: "" // Default to empty string if null
+        groupTitle = intent.getStringExtra("groupTitle") ?: ""
+        authorName = intent.getStringExtra("authorName") ?: ""
+        authorUID = intent.getStringExtra("authorUID") ?: ""
+
         recyclerView = findViewById(R.id.recyclerViewMessages)         // get recycler view
         recyclerView.adapter = messageAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -228,7 +229,7 @@ class ChatActivity : ComponentActivity(){
     fun exitChat(groupChatId: String){
         lateinit var authorUID : String
         firestore.collection("GroupChatIds").document(groupChatId).get().addOnSuccessListener {
-            authorUID = it.getString("authorUID")!!
+            val authorUID = it.getString("authorUID") ?: return@addOnSuccessListener
             // TODO: disconnect from the firebase
             //finish()    // alternative: exit the chat
             if(authorUID != auth.currentUser!!.uid){
@@ -485,7 +486,7 @@ class ChatActivity : ComponentActivity(){
         val curUid = FirebaseAuth.getInstance().currentUser?.uid
         // Retrieve the display name from SharedPreferences
         val sharedPreferences = getSharedPreferences("cache", Context.MODE_PRIVATE)
-        val displayName = sharedPreferences.getString("displayName", "Default Display Name")
+        val displayName = sharedPreferences.getString("displayName", "Default Display Name") ?: "Default Display Name"
         Log.i("beforeSend","inside sendNotification shared prefs")
         //retriev th name of current user
         // Query the Firestore collection "Accounts" to retrieve FCM tokens
